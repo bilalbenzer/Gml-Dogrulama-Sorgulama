@@ -21,6 +21,7 @@ import base64
 import threading
 import re
 import time
+import webbrowser
 # Pencereyi oluştur
 # Pencereyi ekranın ortasında açma
 
@@ -163,6 +164,9 @@ isteksahibi=kullanici_bilgi_kontrol()
 def start_upload_thread():
     # Dosya yükleme işlemini bir iş parçacığında çalıştır
     threading.Thread(target=soldaki_buton_tikla, daemon=True).start()
+    
+def open_url(url):
+    webbrowser.open(url)
 def soldaki_buton_tikla():
     text_box.delete(1.0, tk.END)
     gonderilecekveri= {"sender":json.loads(isteksahibi)}    #Kullanıcı Bilgileri Json Formatında Çekilir
@@ -234,20 +238,40 @@ def soldaki_buton_tikla():
             text_box.insert(tk.END,f"Doğrulama Başlatıldı. {gonderilecekveri['sender']['eMail']} Mail adresinizi kontrol ediniz.")
             #durum kontrol
             durumata=""
-            
-            while durumata=="":
+            deneme=0
+            while durumata=="" or deneme==120:
+                deneme+=5
                 time.sleep(5)
                 try:
                     kontroldurum = requests.post("https://3dbinadogrulaservis.tkgm.gov.tr/api/ArchitecturalBuilding/GetArchitecturalBuildingControlSummary",json={"architecturalBuildingControlId":responseid})
                     print(kontroldurum.json())
                     if kontroldurum.json()["controlState"]=="CheckSuccessfull":
                         durumata=kontroldurum.json()["validationCodeNumber"]
+                        text_box.delete(1.0, tk.END)
+                        text_box.insert(tk.END,f"Validasyon Kodu:{durumata}\nSonuç Sayfası:https://3dbinadogrula.tkgm.gov.tr/#/validasyon/sonuc/detayb?validationCode={durumata}")
+                        # URL'yi tıklanabilir hale getirme
+                        url=f"https://3dbinadogrula.tkgm.gov.tr/#/validasyon/sonuc/detayb?validationCode={durumata}"
+                        text_box.tag_add("link", "2.0", "2.end")  # Burada "2.0" ve "2.end" satır ve karakter aralığını temsil eder.
+                        text_box.tag_configure("link", foreground="blue", underline=True)
+                        text_box.tag_bind("link", "<Button-1>", lambda e: open_url(url))  # Sol fare tıklamasını bağlama
+                    elif kontroldurum.json()["controlState"]=="CheckFailed":
+                        messagebox.showerror("DOĞRULAMA BAŞARISIZ",f"Doğrulama Başarısız Oldu. Bilgi İçin https://3dbinadogrula.tkgm.gov.tr/#/validasyon/sonuc/detayh?detayid={responseid}")
+                        text_box.delete(1.0, tk.END)
+                        text_box.insert(tk.END,f"Doğrulama Başarısız Oldu. Sonuçları Görmek İçin Url' ye gidiniz.\nhttps://3dbinadogrula.tkgm.gov.tr/#/validasyon/sonuc/detayh?detayid={responseid}")
+                        # URL'yi tıklanabilir hale getirme
+                        text_box.tag_add("link", "2.0", "2.end")  # Burada "2.0" ve "2.end" satır ve karakter aralığını temsil eder.
+                        text_box.tag_configure("link", foreground="blue", underline=True)
+                        url=f"Doğrulama Başarısız Oldu. Sonuçları Görmek İçin Url' ye gidiniz.\nhttps://3dbinadogrula.tkgm.gov.tr/#/validasyon/sonuc/detayh?detayid={responseid}"
+                        text_box.tag_bind("link", "<Button-1>", lambda e: open_url(url))  # Sol fare tıklamasını bağlama
+                        break
+                    elif kontroldurum.json()["controlState"]=="CheckContinue":
+                        text_box.insert(tk.END,"\nKontrol Devam Ediyor.")
                 except:
-                    print("Yanıt Alınamadı. Sorgu Devam Edecek")
-            text_box.insert(tk.END,f"\nValidasyon Kodu:{durumata}\nSonuç Sayfası:https://3dbinadogrula.tkgm.gov.tr/#/validasyon/sonuc/detayb?validationCode={durumata}")
-                
-            
-
+                    text_box.insert(tk.END,"Sunucudan Yanıt Alınamadı. Mail Adresini Kontrol Ediniz.")
+                    break
+                if deneme==115:
+                    messagebox.showerror("UYARI","Sunucudan Yanıt Alınamadı. Mail Adresini Kontrol Ediniz.")
+                    break
         else:
             messagebox.showwarning("HATA","GML İSİMLERİNİ KONTROL EDİNİZ.")
 
