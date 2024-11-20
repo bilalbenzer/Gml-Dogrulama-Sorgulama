@@ -22,9 +22,11 @@ import threading
 import re
 import time
 import webbrowser
+import subprocess
+
 # Pencereyi oluştur
 # Pencereyi ekranın ortasında açma
-
+chrome_path = r"C:\Program Files\Google\Chrome\Application\chrome.exe %s"
 # TKGM Sisteminde Gml Yüklerken Gerekli Olan Form Bilgilerinin Alınması
 def kullanici_bilgi_kontrol():
     dosya_yol="kullanici_bilgi.txt"
@@ -166,7 +168,11 @@ def start_upload_thread():
     threading.Thread(target=soldaki_buton_tikla, daemon=True).start()
     
 def open_url(url):
-    webbrowser.open(url)
+    try:
+        subprocess.run(["C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe", url])
+    except:
+        messagebox.showerror("UYARI","Chrome belirtilen konumda bulunamadı (C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe). Url' yi kopyalayarak işlem yapınız.")
+    
 def soldaki_buton_tikla():
     text_box.delete(1.0, tk.END)
     gonderilecekveri= {"sender":json.loads(isteksahibi)}    #Kullanıcı Bilgileri Json Formatında Çekilir
@@ -261,7 +267,7 @@ def soldaki_buton_tikla():
                         # URL'yi tıklanabilir hale getirme
                         text_box.tag_add("link", "2.0", "2.end")  # Burada "2.0" ve "2.end" satır ve karakter aralığını temsil eder.
                         text_box.tag_configure("link", foreground="blue", underline=True)
-                        url=f"Doğrulama Başarısız Oldu. Sonuçları Görmek İçin Url' ye gidiniz.\nhttps://3dbinadogrula.tkgm.gov.tr/#/validasyon/sonuc/detayh?detayid={responseid}"
+                        url=f"https://3dbinadogrula.tkgm.gov.tr/#/validasyon/sonuc/detayh?detayid={responseid}"
                         text_box.tag_bind("link", "<Button-1>", lambda e: open_url(url))  # Sol fare tıklamasını bağlama
                         break
                     elif kontroldurum.json()["controlState"]=="CheckContinue":
@@ -280,6 +286,10 @@ def soldaki_buton_tikla():
 
 # Sağ butonun tıklama fonksiyonu
 def sagdaki_buton_tikla():
+    for widget in frame_sag.winfo_children():
+        if type(widget)==tk.Frame:
+            widget.destroy()
+    time.sleep(3)
     girilen_metni = entry.get()  # Giriş alanındaki metni al
     if len(girilen_metni)==6:   # Validasyon Kodu 6 hanelidir
         response=requests.post("https://3dbinadogrulaservis.tkgm.gov.tr/api/ArchitecturalBuilding/ArchitecturalBuildingControlStateControl",json={"validationCode":girilen_metni}) # Durum Bilgisi Alma
@@ -287,7 +297,7 @@ def sagdaki_buton_tikla():
             result=response.json()
             durumbilgi=f"{result['stateDescription']}, Açıklama: {result['stateDefinition']}" 
             label_info.config(text=f"Bilgi: {durumbilgi}")  # Bilgi kutusunu güncelle
-            create_buttons(girilen_metni)
+            create_buttons()
         else:
             messagebox.showinfo("HATA","Hata Oluştu. Tekrar Deneyin")
     else:
@@ -300,7 +310,8 @@ def sagdaki_buton_tikla():
    
 
 # 3 yeni buton eklemek için fonksiyon
-def create_buttons(girilen_metni):
+def create_buttons():
+    girilen_metni = entry.get()
     # Eğer butonlar zaten eklenmişse, tekrar eklememek için bir kontrol yapalım
     def pdfindir():
         pdfindir=requests.post(url="https://3dbinadogrulaservis.tkgm.gov.tr/api/ArchitecturalBuilding/GetArchitecturalBuildingControlDetail",json={"validationCode":girilen_metni}) #Mimari detaylarını alma
@@ -320,20 +331,18 @@ def create_buttons(girilen_metni):
             with open(gmlisim,"wb") as f:
                 f.write(gmlindir.content)   #Yerel Klasöre Kaydetme
         messagebox.showinfo("BİLGİ","Doğrulama Kodunda Yer Alan Tüm Gml Dosyaları, Program klasörüne İndirilmiştir.")      
-    if not hasattr(create_buttons, "buttons_created") or not create_buttons.buttons_created:
-        # Yeni butonları içerecek bir çerçeve (frame) oluştur
-        button_frame = tk.Frame(frame_sag)
-        button_frame.pack(pady=20)  # Bilgi kutusunun altına yerleştirildi
         
-        # 3 tane buton ekle
-        button1 = tk.Button(button_frame, text="Pdf İndir", command=pdfindir)
-        button1.grid(row=0, column=0, padx=10)
+    # Yeni butonları içerecek bir çerçeve (frame) oluştur
+    button_frame = tk.Frame(frame_sag)
+    button_frame.pack(pady=20)  # Bilgi kutusunun altına yerleştirildi
+    
+    # 3 tane buton ekle
+    button1 = tk.Button(button_frame, text="Pdf İndir", command=pdfindir)
+    button1.grid(row=0, column=0, padx=10)
 
-        button2 = tk.Button(button_frame, text="GML İndir", command=gmlindir)
-        button2.grid(row=0, column=1, padx=10)
-        
-        # Butonlar eklenmiş olduğu bilgisini sakla
-        create_buttons.buttons_created = True
+    button2 = tk.Button(button_frame, text="GML İndir", command=gmlindir)
+    button2.grid(row=0, column=1, padx=10)
+
 
 if isteksahibi!=None:
     root = tk.Tk()
