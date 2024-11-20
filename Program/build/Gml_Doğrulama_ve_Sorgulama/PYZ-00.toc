@@ -1,5 +1,5 @@
 ('C:\\Users\\Bilal '
- 'Benzer\\Desktop\\surec_sorgu\\masaustu-program\\build\\Gml_Doğrulama_ve_Sorgulama\\PYZ-00.pyz',
+ 'Benzer\\Documents\\Program\\build\\Gml_Doğrulama_ve_Sorgulama\\PYZ-00.pyz',
  [('inspect',
    'C:\\Users\\Bilal '
    'Benzer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\inspect.py',
@@ -51,18 +51,6 @@
   ('random',
    'C:\\Users\\Bilal '
    'Benzer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\random.py',
-   'PYMODULE'),
-  ('_strptime',
-   'C:\\Users\\Bilal '
-   'Benzer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\_strptime.py',
-   'PYMODULE'),
-  ('datetime',
-   'C:\\Users\\Bilal '
-   'Benzer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\datetime.py',
-   'PYMODULE'),
-  ('calendar',
-   'C:\\Users\\Bilal '
-   'Benzer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\calendar.py',
    'PYMODULE'),
   ('statistics',
    'C:\\Users\\Bilal '
@@ -252,6 +240,18 @@
    'C:\\Users\\Bilal '
    'Benzer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\email\\_parseaddr.py',
    'PYMODULE'),
+  ('calendar',
+   'C:\\Users\\Bilal '
+   'Benzer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\calendar.py',
+   'PYMODULE'),
+  ('datetime',
+   'C:\\Users\\Bilal '
+   'Benzer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\datetime.py',
+   'PYMODULE'),
+  ('_strptime',
+   'C:\\Users\\Bilal '
+   'Benzer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\_strptime.py',
+   'PYMODULE'),
   ('socket',
    'C:\\Users\\Bilal '
    'Benzer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\socket.py',
@@ -344,10 +344,6 @@
    'C:\\Users\\Bilal '
    'Benzer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\tracemalloc.py',
    'PYMODULE'),
-  ('stringprep',
-   'C:\\Users\\Bilal '
-   'Benzer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\stringprep.py',
-   'PYMODULE'),
   ('getpass',
    'C:\\Users\\Bilal '
    'Benzer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\getpass.py',
@@ -391,6 +387,10 @@
   ('_py_abc',
    'C:\\Users\\Bilal '
    'Benzer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\_py_abc.py',
+   'PYMODULE'),
+  ('stringprep',
+   'C:\\Users\\Bilal '
+   'Benzer\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\stringprep.py',
    'PYMODULE'),
   ('threading',
    'C:\\Users\\Bilal '

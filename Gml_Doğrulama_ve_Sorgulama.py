@@ -20,6 +20,7 @@ import requests
 import base64
 import threading
 import re
+import time
 # Pencereyi oluştur
 # Pencereyi ekranın ortasında açma
 
@@ -231,6 +232,22 @@ def soldaki_buton_tikla():
             dogrulama_baslat=requests.post("https://3dbinadogrulaservis.tkgm.gov.tr/api/ArchitecturalBuilding/ArchitecturalBuildingControlStartControl",json={"architecturalBuildingControlId":responseid}) #Gml yüklendikten sonra doğrulamanın başlatılması için istek yapılır
             text_box.delete(1.0, tk.END)
             text_box.insert(tk.END,f"Doğrulama Başlatıldı. {gonderilecekveri['sender']['eMail']} Mail adresinizi kontrol ediniz.")
+            #durum kontrol
+            durumata=""
+            
+            while durumata=="":
+                time.sleep(5)
+                try:
+                    kontroldurum = requests.post("https://3dbinadogrulaservis.tkgm.gov.tr/api/ArchitecturalBuilding/GetArchitecturalBuildingControlSummary",json={"architecturalBuildingControlId":responseid})
+                    print(kontroldurum.json())
+                    if kontroldurum.json()["controlState"]=="CheckSuccessfull":
+                        durumata=kontroldurum.json()["validationCodeNumber"]
+                except:
+                    print("Yanıt Alınamadı. Sorgu Devam Edecek")
+            text_box.insert(tk.END,f"\nValidasyon Kodu:{durumata}\nSonuç Sayfası:https://3dbinadogrula.tkgm.gov.tr/#/validasyon/sonuc/detayb?validationCode={durumata}")
+                
+            
+
         else:
             messagebox.showwarning("HATA","GML İSİMLERİNİ KONTROL EDİNİZ.")
 
@@ -313,7 +330,7 @@ button_sol.pack(side="top", pady=10)
 
 
 # Metin kutusu (Text Box)
-text_box = tk.Text(frame_sol, height=5, width=40)
+text_box = tk.Text(frame_sol, height=20, width=40)
 text_box.pack(side="top", pady=10)
 
 # Sağ taraf için bir çerçeve (frame)
@@ -322,7 +339,7 @@ frame_sag.pack(side="right", padx=20, pady=30)
 
 # Giriş alanı (Input)
 entry = tk.Entry(frame_sag, width=30)
-entry.pack(pady=10)
+entry.pack(pady=40)
 entry.insert(0,"Doğrulama Kodu")
 
 # Sağ buton
